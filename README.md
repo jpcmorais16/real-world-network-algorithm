@@ -5,4 +5,6 @@
 ### 2) Small-world phenomenon: Short average distances between nodes.
 ### 3) High clustering coefficients: Nodes form tightly knit communities.
 
+
+
 ## The algorithm utilizes random walks across the network and iteratively adds edges based on a probability distribution. Edges are created with decreasing probability to link distant nodes, enabling the formation of a small-world structure.
