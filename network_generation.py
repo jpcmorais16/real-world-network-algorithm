@@ -4,7 +4,7 @@ from extra_edge import create_edge
 from random_walk import random_walk
 
 
-def network_generation(number_of_nodes: int, probability_step_length_one: float,
+def generate_network(number_of_nodes: int, probability_step_length_one: float,
                           n_marked: float, graph=nx.cycle_graph(10)) -> nx.Graph:
     
     n_nodes = graph.number_of_nodes()
