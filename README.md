@@ -9,5 +9,13 @@
 ### Import the 'generate_network' function from the 'network_generation.py' file and call it with the desired parameters.
 
 ### Example:
-![example](./images/example.png)
+```
+import network_generation as ng
+import networkx as nx
+
+network = ng.generate_network(number_of_nodes=1000, probability_step_length_one=0.5, n_marked=5)
+
+print('Average clustering coefficient:', nx.average_clustering(network))
+print('Average shortest path length:', nx.average_shortest_path_length(network))
+```
 ![example2](./images/example2.png)
