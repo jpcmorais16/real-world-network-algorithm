@@ -7,7 +7,7 @@
 
 ### Each random walk marks a number of nodes given as a parameter to the algorithm, creates a new node on the network, and creates edges linking all of the marked nodes to the new node. The process is repeated until the network has the wished amount of edges.
 
-### The starting graph can be chosen freely, and it will default to a cycle graph with 10 nodes not configured.
+### The starting graph can be chosen freely, and it will default to a cycle graph with 10 nodes if not configured.
 
 ## How to use
 ### Import the 'generate_network' function from the 'network_generation.py' file and call it with the desired parameters, which are:
