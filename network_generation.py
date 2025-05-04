@@ -11,7 +11,7 @@ def generate_network(number_of_nodes: int, probability_step_length_one: float,
 
     for _ in range(0, number_of_nodes):
         
-        start = random.randint(1, n_nodes-1)
+        start = random.randint(0, n_nodes-1)
 
         graph.add_node(n_nodes)
 
