@@ -1,0 +1,9 @@
+*.o
+.vscode/settings.json
+network_metrics
+main
+*.txt
+*.png
+__pycache__/
+*.py[cod]
+*$py.class
