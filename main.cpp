@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <vector>
 #include <unordered_set>
 #include <random>
@@ -33,7 +33,7 @@ std::string get_brazil_time() {
     auto now = std::chrono::system_clock::now();
     auto time_t = std::chrono::system_clock::to_time_t(now);
     
-    // Brazil is UTC-3 (BRT - Brasília Time)
+    // Brazil is UTC-3 (BRT - Brasí­lia Time)
     // Convert to Brazil time by subtracting 3 hours
     auto brazil_time = std::chrono::system_clock::from_time_t(time_t) - std::chrono::hours(3);
     time_t = std::chrono::system_clock::to_time_t(brazil_time);
@@ -595,7 +595,7 @@ void print_usage(const char* program_name) {
     std::cout << "  -fp <probability>    Friendship probability between marked nodes (0.0 to 1.0, e.g., 0.1, 0.5, 0.9)\n\n";
     std::cout << "Optional Parameters:\n";
     std::cout << "  -n <number>          Number of simulations to run (default: 5)\n";
-    std::cout << "  -o <filename>       Output file path (default: distances_<N>.txt)\n";
+    std::cout << "  -o <filename>       Output file path (default: output_<N>.txt)\n";
     std::cout << "  -id <execution_id>   Execution ID for checkpoint/resume functionality\n";
     std::cout << "  -h, --help           Show this help message\n\n";
     std::cout << "Examples:\n";
@@ -608,6 +608,7 @@ void print_usage(const char* program_name) {
     std::cout << "  average path length, power law coefficients, and more.\n";
 }
 
+#ifndef TESTING
 int main(int argc, char* argv[]) {
     // Default values
     int N = -1;
@@ -686,7 +687,7 @@ int main(int argc, char* argv[]) {
     // Set default output file if not provided
     if (output_file.empty()) {
         std::ostringstream oss;
-        oss << "distances_" << N << ".txt";
+        oss << "output_" << N << ".txt";
         output_file = oss.str();
     }
     
@@ -735,3 +736,4 @@ int main(int argc, char* argv[]) {
     
     return 0;
 }
+#endif // TESTING

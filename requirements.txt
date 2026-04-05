@@ -1,0 +1,5 @@
+numpy>=1.21
+powerlaw>=1.5
+python-igraph>=0.10
+pytest>=7.0
+pytest-cov>=4.0

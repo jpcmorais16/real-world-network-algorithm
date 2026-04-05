@@ -251,60 +251,61 @@ def is_combination_before_or_equal(current, target):
         return True
     return False
 
-last_completed = get_last_completed_combination("output2.txt")
-if last_completed:
-    print(f"Resuming from last completed combination: N={last_completed[0]}, m={last_completed[1]}, p={last_completed[2]}, fp={last_completed[3]}")
-    print("Skipping already completed combinations...")
-else:
-    print("Starting from the beginning (no previous output found)")
+if __name__ == '__main__':
+    last_completed = get_last_completed_combination("output2.txt")
+    if last_completed:
+        print(f"Resuming from last completed combination: N={last_completed[0]}, m={last_completed[1]}, p={last_completed[2]}, fp={last_completed[3]}")
+        print("Skipping already completed combinations...")
+    else:
+        print("Starting from the beginning (no previous output found)")
 
-for N in [10687]:
-    for m in [3]:
-        for p in [0.47]:
-            for fp in [0.1]:
-                current_combination = (N, m, p, fp)
-                if last_completed and is_combination_before_or_equal(current_combination, last_completed):
-                    continue
-                sum_alpha = 0
-                sum_path_length = 0
-                sum_clustering = 0
-                sum_edges = 0
-                sum_max_degree = 0
+    for N in [10687]:
+        for m in [3]:
+            for p in [0.47]:
+                for fp in [0.1]:
+                    current_combination = (N, m, p, fp)
+                    if last_completed and is_combination_before_or_equal(current_combination, last_completed):
+                        continue
+                    sum_alpha = 0
+                    sum_path_length = 0
+                    sum_clustering = 0
+                    sum_edges = 0
+                    sum_max_degree = 0
 
-                n = 1
-                
-                for i in range(n):
-                    brazil_time = datetime.now(ZoneInfo("America/Sao_Paulo"))
-                    print(brazil_time.strftime("%Y-%m-%d %H:%M:%S %Z"), i, "/", n)
-
-                    graph = generate_network(N, m, p, fp)
-
-                    alpha_estimate = calculate_alpha(graph)
-                    sum_alpha += alpha_estimate
-
-                    max_degree = max(len(graph[i]) for i in range(len(graph)))
-                    sum_max_degree += max_degree
-
-                    g = graph_to_igraph(graph)
+                    n = 1
                     
-                    num_edges = g.ecount()
-                    sum_edges += num_edges
-                    
-                    if N < 50000 or i % 6 == 0:
-                        path_length = g.average_path_length()
-                        sum_path_length += path_length
+                    for i in range(n):
+                        brazil_time = datetime.now(ZoneInfo("America/Sao_Paulo"))
+                        print(brazil_time.strftime("%Y-%m-%d %H:%M:%S %Z"), i, "/", n)
 
-                    clustering = g.transitivity_avglocal_undirected()
-                    sum_clustering += clustering
+                        graph = generate_network(N, m, p, fp)
+
+                        alpha_estimate = calculate_alpha(graph)
+                        sum_alpha += alpha_estimate
+
+                        max_degree = max(len(graph[i]) for i in range(len(graph)))
+                        sum_max_degree += max_degree
+
+                        g = graph_to_igraph(graph)
+                        
+                        num_edges = g.ecount()
+                        sum_edges += num_edges
+                        
+                        if N < 50000 or i % 6 == 0:
+                            path_length = g.average_path_length()
+                            sum_path_length += path_length
+
+                        clustering = g.transitivity_avglocal_undirected()
+                        sum_clustering += clustering
+                        
+                    avg_alpha = sum_alpha / n
+                    avg_path_length = sum_path_length / (n if N != 200000 else 5)
+                    avg_clustering = sum_clustering / n
+                    avg_edges = sum_edges / n
+                    avg_max_degree = sum_max_degree / n
+                    result_line = f"{N}, {m}, {p}, {fp}, {avg_alpha:.4f}, {avg_path_length:.4f}, {avg_clustering:.4f}, {avg_edges:.0f}, {avg_max_degree:.0f}\n"
+                    print(result_line.strip())
                     
-                avg_alpha = sum_alpha / n
-                avg_path_length = sum_path_length / (n if N != 200000 else 5)
-                avg_clustering = sum_clustering / n
-                avg_edges = sum_edges / n
-                avg_max_degree = sum_max_degree / n
-                result_line = f"{N}, {m}, {p}, {fp}, {avg_alpha:.4f}, {avg_path_length:.4f}, {avg_clustering:.4f}, {avg_edges:.0f}, {avg_max_degree:.0f}\n"
-                print(result_line.strip())
-                
-                with open("result.txt", "a") as f:
-                    f.write(result_line)
+                    with open("result.txt", "a") as f:
+                        f.write(result_line)
 

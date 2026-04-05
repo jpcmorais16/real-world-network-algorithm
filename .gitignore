@@ -1,9 +1,32 @@
+# Build artifacts
 *.o
-.vscode/settings.json
 network_metrics
 main
+
+# IDE
+.vscode/settings.json
+
+# Output / data files
 *.txt
+!requirements.txt
 *.png
+
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
+.pytest_cache/
+*.egg-info/
+htmlcov/
+.coverage
+
+# Example outputs (generated at runtime)
+examples/sweep_results.csv
+examples/network_edges.txt
+examples/example_output_*.txt
+
+# Checkpoint files
+checkpoint_*
+
+# C++ test binary
+tests/test_network

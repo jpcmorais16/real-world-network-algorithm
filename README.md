@@ -1,347 +1,390 @@
-# Large Network Generator
+# Real-World Network Algorithm
 
-A comprehensive toolkit for generating, analyzing, and studying complex network structures using a random walk-based growth model. This project enables researchers to study network properties, power law distributions, clustering behavior, and path length characteristics through both C++ and Python implementations.
+A toolkit for generating and analyzing complex networks using a **random walk-based preferential attachment growth model**. The model starts from a ring topology and grows the network by adding nodes that connect to existing nodes discovered via random walks, producing networks with real-world properties such as power-law degree distributions, high clustering, and short average path lengths.
 
-## 🔍 Overview
+This project provides both a **C++ implementation** (optimized for large-scale simulations) and a **Python implementation** (for prototyping and quick experiments).
 
-This project provides a complete pipeline for network generation and analysis:
+---
 
-1. **Network Generation**: Create networks using a random walk-based growth algorithm
-2. **Network Analysis**: Compute metrics, such as power law distributions and structural properties
+## Table of Contents
 
-### Key Features
+- [Overview](#overview)
+- [Project Structure](#project-structure)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Usage](#usage)
+  - [C++ Implementation](#c-implementation)
+  - [Python Implementation](#python-implementation)
+- [Algorithm Description](#algorithm-description)
+- [Network Metrics](#network-metrics)
+- [Examples](#examples)
+- [Testing](#testing)
+- [Reproducibility](#reproducibility)
+- [Expected Output](#expected-output)
+- [Troubleshooting](#troubleshooting)
+- [License](#license)
+- [References](#references)
 
-- 🌐 **Random Walk Network Generation**: Growth model starting from a ring topology with configurable parameters
-- 📊 **Comprehensive Metrics**: Average path length, clustering coefficient, power law analysis
-- ⚡ **High Performance**: C++ implementation with multi-process parallelization for path calculations
-- 💾 **Checkpoint/Resume**: Save and resume long-running simulations
-- 🔄 **Dual Implementation**: Both C++ (high performance) and Python (prototyping) versions
-- 📈 **Statistical Analysis**: Power law fitting with Pearson correlation coefficients
+---
 
-## 📁 Project Structure
+## Overview
+
+The network generation follows a random walk-based growth process:
+
+1. **Initialization**: A ring of 10 nodes is created.
+2. **Growth**: For each of *N* new nodes:
+   - A random starting node is selected.
+   - Random walks discover *m* nodes (on average) to connect to.
+   - The new node is connected to all discovered (marked) nodes.
+   - With probability *fp*, edges are also created between pairs of marked nodes (friendship/triadic closure).
+
+This process produces networks exhibiting:
+
+- **Scale-free degree distributions** (power-law tails)
+- **High clustering coefficients** (triadic closure)
+- **Small-world property** (short average path lengths)
+
+---
+
+## Project Structure
 
 ```
-large-network-generator/
-├── README.md                          # This file
-├── main.cpp                           # Main C++ program with network generation and simulation
-├── networkMetrics.h                   # C++ header for network analysis functions
-├── networkMetrics.cpp                 # C++ implementation of network metrics
-├── Makefile                           # Build configuration for C++ project
-└── python/                            # Python implementation
-    └── network_generator.py           # Python network generation and analysis
+real-world-network-algorithm/
+├── README.md                       # This file
+├── Makefile                        # Build configuration for C++ project
+├── main.cpp                        # Main C++ entry point (network generation + simulation)
+├── networkMetrics.h                # C++ header: metric computation declarations
+├── networkMetrics.cpp              # C++ implementation: metrics (path length, clustering, power law)
+├── requirements.txt                # Python dependencies
+├── python/
+│   └── network_generator.py        # Python network generation and batch analysis
+├── examples/
+│   ├── basic_generation.py         # Generate a small network and print metrics
+│   ├── parameter_sweep.py          # Sweep over parameter ranges, save results to CSV
+│   ├── export_edge_list.py         # Generate a network and export it as an edge list
+│   └── run_cpp_examples.sh         # Shell script demonstrating C++ CLI usage
+├── tests/
+│   ├── test_network_generator.py   # Python unit tests (pytest)
+│   └── test_network.cpp            # C++ unit tests
+└── v1/                             # Legacy v1 implementation (uses networkx)
+    ├── example.py
+    ├── network_generation.py
+    ├── random_walk.py
+    └── extra_edge.py
 ```
 
-## 🔄 Complete Workflow
+---
 
-### Phase 1: Network Generation
-Generate networks using random walk-based growth algorithm with configurable parameters (N, m, p, fp)
+## Prerequisites
 
-### Phase 2: Network Analysis
-Calculate network metrics including path length, clustering, and power law distributions
+| Component | Requirement |
+|-----------|-------------|
+| **C++ compiler** | GCC or Clang with C++11 support |
+| **Make** | GNU Make (for building C++) |
+| **OS for C++** | Linux or macOS (uses `fork`/`wait`). On Windows, use **WSL**. |
+| **Python** | 3.8 or later |
+| **Python packages** | Listed in `requirements.txt` |
 
-### Phase 3: Statistical Analysis
-Run multiple simulations and compute averages with standard deviations
+---
 
-## 🚀 Installation
+## Installation
 
-### Prerequisites
-
-- **C++ Compiler** (GCC/Clang with C++11 support)
-- **Python 3.8+** (for Python implementation)
-- **Make** (for building C++ project)
-
-### 1. Build C++ Project
+### 1. Clone the repository
 
 ```bash
-# Build the project
+git clone https://github.com/<your-username>/real-world-network-algorithm.git
+cd real-world-network-algorithm
+```
+
+### 2. Install Python dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 3. Build the C++ project (Linux / macOS / WSL)
+
+```bash
+make clean
+make
+```
+
+This produces the `network_metrics` executable in the project root.
+
+---
+
+## Quick Start
+
+### Python — generate a small network in 2 lines
+
+```bash
+cd examples
+python basic_generation.py
+```
+
+Or interactively:
+
+```python
+import sys, os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'python'))
+from network_generator import generate_network
+
+graph = generate_network(N=1000, m=4, p=0.5, fp=0.3)
+print(f"Nodes: {len(graph)}")
+print(f"Edges: {sum(len(s) for s in graph) // 2}")
+```
+
+### C++ — run a simulation from the command line
+
+```bash
+# Build
 make
 
-# Or build and run
-make run
+# Run a simulation: 10 000 nodes, m=4, p=0.5, fp=0.3, 5 repetitions
+./network_metrics -N 10000 -m 4 -p 0.5 -fp 0.3
+
+# Show all options
+./network_metrics --help
 ```
 
-### 2. Install Python Dependencies
+---
 
-```bash
-pip install numpy powerlaw igraph
-```
-
-## 🎯 Quick Start Guide
+## Usage
 
 ### C++ Implementation
 
+#### Command-Line Interface
+
+```
+./network_metrics -N <nodes> -m <connections> -p <probability> -fp <friendship_prob> [OPTIONS]
+```
+
+**Required parameters:**
+
+| Flag | Description | Example |
+|------|-------------|---------|
+| `-N` | Number of nodes to add to the initial 10-node ring | `10000` |
+| `-m` | Average number of connections per new node | `4`, `6` |
+| `-p` | Probability parameter controlling random walk step length (0–1) | `0.5` |
+| `-fp` | Friendship probability between marked nodes (0–1) | `0.3` |
+
+**Optional parameters:**
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `-n` | Number of simulation repetitions | `5` |
+| `-o` | Output file path | `output_<N>.txt` |
+| `-id` | Execution ID for checkpoint/resume | *(disabled)* |
+| `-h` | Show help | — |
+
+#### Checkpoint / Resume
+
+For long-running simulations, pass `-id <name>` to enable checkpointing. If interrupted, re-run the same command to resume:
+
 ```bash
-# Build the project
-make
+./network_metrics -N 200000 -m 6 -p 0.7 -fp 0.5 -id experiment_001
+# ...interrupted...
+./network_metrics -N 200000 -m 6 -p 0.7 -fp 0.5 -id experiment_001   # resumes
+```
 
-# Run a simulation with specific parameters
-./network_metrics -N 10000 -m 4 -p 0.5 -fp 0.3
+Checkpoint files created: `checkpoint_<id>_graph.txt`, `checkpoint_<id>_results.txt`, `checkpoint_<id>_completed.txt`.
 
-# Run with all options (10 simulations, custom output file, checkpointing)
-./network_metrics -N 200000 -m 6 -p 0.7 -fp 0.5 -n 10 -o results.txt -id my_simulation
+#### Output format
 
-# Show help message
-./network_metrics --help
+Each line in the output file is tab-separated:
+
+```
+N  p  m  fp  avg_clustering // std  avg_transitivity // std  avg_path_length // std  pearson_r // std  slope // std  slope_cumulative // std  r_cumulative // std  max_degree // std  construction_time // std  path_calc_time // std  total_time // std
 ```
 
 ### Python Implementation
 
+The Python module in `python/network_generator.py` provides the core `generate_network()` function and several analysis utilities. See the [Examples](#examples) section below for usage patterns.
+
+#### Key functions
+
+| Function | Description |
+|----------|-------------|
+| `generate_network(N, m, p, fp)` | Returns an adjacency-list graph (`list[set]`) |
+| `calculate_alpha(graph)` | Estimates the power-law exponent α |
+| `graph_to_igraph(graph)` | Converts to an `igraph.Graph` for advanced analysis |
+| `average_shortest_path_length(graph)` | BFS-based average shortest path (pure Python) |
+
+---
+
+## Algorithm Description
+
+### Parameters
+
+| Symbol | Parameter | Role |
+|--------|-----------|------|
+| *N* | Network size | Number of new nodes added after the initial ring |
+| *m* | Attachment count | Average number of existing nodes each new node connects to |
+| *p* | Walk probability | Controls the geometric-like step-length distribution of the random walk |
+| *fp* | Friendship probability | Probability of creating an edge between each pair of marked nodes (triadic closure) |
+
+### Random Walk Step-Length Distribution
+
+The number of steps *x* in each random walk is drawn from a truncated geometric distribution (x = 1, …, 10):
+
+$$P(x) = \frac{p \cdot (1-p)^{x-1}}{1 - (1-p)^{10}}$$
+
+- When *p* is close to 1, walks are short (mostly 1 step) → connections stay local.
+- When *p* is close to 0, walks are longer → connections are more global.
+
+### Growth Process (pseudocode)
+
+```
+initialize ring graph G with 10 nodes
+for i = 1 to N:
+    start ← random node in G
+    marked ← {start}
+    current ← start
+    for j = 1 to floor(m) - 1:
+        steps ← sample from P(x)
+        current ← random_walk(G, current, steps)
+        marked ← marked ∪ {current}
+    add node v_new to G
+    for each u in marked:
+        add edge (v_new, u)
+    for each pair (u, w) in marked:
+        with probability fp:
+            add edge (u, w)
+```
+
+## Network Metrics
+
+| Metric | Description |
+|--------|-------------|
+| **Average path length** | Mean shortest-path distance over all reachable pairs (BFS-based, parallelized in C++) |
+| **Clustering coefficient** | Average local clustering coefficient across all nodes |
+| **Power-law exponent (α)** | Slope of log-log regression on the degree distribution |
+| **Cumulative power-law exponent** | Slope from the complementary cumulative degree distribution |
+| **Pearson r** | Correlation coefficient of the log-log fit |
+| **Max degree** | Largest node degree in the network |
+
+---
+
+## Examples
+
+Ready-to-run example scripts are provided in the `examples/` directory.
+
+### 1. Basic network generation (Python)
+
 ```bash
-cd python
-python network_generator.py
+python examples/basic_generation.py
 ```
 
-## 📖 Detailed Usage
+Generates a small network (N=1000) and prints node count, edge count, clustering coefficient, and power-law exponent.
 
-### Network Generation Algorithm
-
-The network generation follows this process:
-
-1. **Initial Ring**: Start with 10 nodes connected in a ring topology
-2. **Node Addition**: For each of N new nodes:
-   - Select a random starting node
-   - Perform random walks to mark `m` nodes (on average)
-   - Connect the new node to all marked nodes
-   - Create edges between marked nodes with probability `fp`
-
-#### Parameters Explained
-
-- **N**: Number of new nodes to add to the initial 10-node ring
-- **m**: Average number of nodes to mark via random walks (can be fractional)
-- **p**: Probability parameter controlling random walk step length distribution
-- **fp**: Friendship probability - probability of creating edges between marked nodes
-
-### C++ Implementation
-
-#### Command-Line Usage
-
-The C++ program accepts command-line arguments for flexible parameter configuration:
-
-**Required Parameters:**
-- `-N <number>`: Number of nodes to add to the network (e.g., 10000, 200000)
-- `-m <number>`: Average number of connections per new node (e.g., 2, 4, 5, 6, 8, 10)
-- `-p <probability>`: Probability parameter for random walk steps (0.0 to 1.0)
-- `-fp <probability>`: Friendship probability between marked nodes (0.0 to 1.0)
-
-**Optional Parameters:**
-- `-n <number>`: Number of simulations to run (default: 5)
-- `-o <filename>`: Output file path (default: `distances_<N>.txt`)
-- `-id <execution_id>`: Execution ID for checkpoint/resume functionality
-- `-h, --help`: Show help message with usage examples
-
-**Examples:**
+### 2. Parameter sweep (Python)
 
 ```bash
-# Basic usage - run 5 simulations with default output file
-./network_metrics -N 10000 -m 4 -p 0.5 -fp 0.3
-
-# Run 10 simulations with custom output file
-./network_metrics -N 200000 -m 6 -p 0.7 -fp 0.5 -n 10 -o my_results.txt
-
-# Enable checkpointing with execution ID
-./network_metrics -N 50000 -m 5 -p 0.3 -fp 0.7 -id experiment_001
-
-# Show help message
-./network_metrics --help
+python examples/parameter_sweep.py
 ```
 
-#### Checkpoint/Resume Functionality
+Sweeps over combinations of *N*, *m*, *p*, *fp* and writes results to `examples/sweep_results.csv`.
 
-The C++ implementation supports checkpointing for long-running simulations:
+### 3. Export edge list (Python)
 
 ```bash
-# First run - creates checkpoint files
-./network_metrics -N 200000 -m 6 -p 0.7 -fp 0.5 -id my_experiment
-
-# If interrupted, rerun with same parameters and ID to resume
-./network_metrics -N 200000 -m 6 -p 0.7 -fp 0.5 -id my_experiment
+python examples/export_edge_list.py
 ```
 
-Checkpoint files created:
-- `checkpoint_<executionId>_graph.txt` - Network structure
-- `checkpoint_<executionId>_results.txt` - Completed node results
-- `checkpoint_<executionId>_completed.txt` - List of completed nodes
+Generates a network and saves it as a standard edge-list file that can be loaded by NetworkX, igraph, Gephi, etc.
 
+### 4. C++ examples (shell script)
 
-#### Output Format
-
-Each line in the output file contains:
-```
-N    p    m    fp    avg_clust // std_clust    avg_trans // std_trans    avg_path // std_path    r // std_r    slope // std_slope    slope_cumulative // std_slope_cumulative    r_cumulative // std_r_cumulative    max_degree // std_max_degree    construction_time // std_construction_time    path_calc_time // std_path_calc_time    total_time // std_total_time
+```bash
+# Make executable and run
+chmod +x examples/run_cpp_examples.sh
+./examples/run_cpp_examples.sh
 ```
 
-### Python Implementation
+Demonstrates building and running the C++ tool with various parameter combinations.
 
-#### Basic Usage
+---
 
-Edit `python/network_generator.py` to modify parameter ranges:
+## Testing
+
+### Python tests
+
+The test suite uses **pytest** and covers the core generation logic, metric computations, and edge cases.
+
+```bash
+# Install test dependencies
+pip install -r requirements.txt
+
+# Run all tests
+pytest tests/ -v
+
+# Run with coverage
+pytest tests/ -v --cov=python --cov-report=term-missing
+```
+
+### C++ tests
+
+A standalone test file is provided that compiles and runs without external frameworks:
+
+```bash
+# Build and run tests (Linux / macOS / WSL)
+cd tests
+g++ -std=c++11 -O2 -o test_network test_network.cpp -I..
+./test_network
+```
+
+Or use the Makefile target:
+
+```bash
+make test
+```
+
+---
+
+## Reproducibility
+
+To ensure reproducible results across runs:
+
+### Seeding the random number generator
+
+**Python:** Pass a fixed seed before calling `generate_network`:
 
 ```python
-for N in [10687]:
-    for m in [3]:
-        for p in [0.47]:
-            for fp in [0.1]:
-                # Run simulations
-                # Results written to test.txt
+import random
+random.seed(42)
+graph = generate_network(N=1000, m=4, p=0.5, fp=0.3)
 ```
 
-#### Output Format
+**C++:** The C++ implementation currently uses `std::random_device` for seeding by default (non-deterministic). To make runs deterministic, you can modify the global generator in `main.cpp`:
 
-Results are written to `python/result.txt` in CSV format:
-```
-N, m, p, fp, avg_alpha, avg_path_length, avg_clustering, avg_edges, avg_max_degree
-```
-
-## 🔬 Analysis Capabilities
-
-### Network Metrics
-
-#### 1. Average Path Length
-- **Definition**: Average shortest path length between all pairs of connected nodes
-- **Calculation**: BFS-based shortest path algorithm
-- **Parallelization**: Uses child processes for large networks
-- **Checkpointing**: Supports resuming interrupted calculations
-
-#### 2. Clustering Coefficient
-- **Definition**: Average local clustering coefficient across all nodes
-- **Formula**: For each node, ratio of actual triangles to possible triangles
-- **Range**: 0 (no clustering) to 1 (fully clustered)
-
-#### 3. Power Law Analysis
-- **Degree Distribution**: Fits power law to node degree distribution
-- **Cumulative Distribution**: Fits power law to complementary cumulative degree distribution
-- **Metrics**: 
-  - Power law coefficient (α)
-  - Pearson correlation coefficient (r)
-  - Maximum degree
-
-#### 4. Additional Metrics
-- **Transitivity**: Global clustering coefficient
-- **Maximum Degree**: Highest node degree in the network
-- **Number of Edges**: Total edge count
-
-### Performance Features
-
-#### Parallel Processing
-- **Path Length Calculation**: Uses 20 forked processes for BFS calculations
-- **Threading**: Utilizes hardware concurrency for clustering calculations
-- **Process Management**: Automatic cleanup and result aggregation
-
-#### Checkpoint/Resume
-- **Graph Persistence**: Saves network structure for resuming
-- **Incremental Results**: Saves individual node results as they complete
-- **Smart Resumption**: Automatically skips already-computed nodes
-
-## 🔧 Customization
-
-### Running Parameter Sweeps
-
-#### C++ (Using Shell Scripts)
-
-To run multiple parameter combinations, create a shell script:
-
-```bash
-#!/bin/bash
-# Example: run_parameter_sweep.sh
-
-for N in 10000 50000 100000; do
-    for m in 2 3 4 5; do
-        for p in 0.1 0.3 0.5; do
-            for fp in 0.1 0.3 0.5; do
-                ./network_metrics -N $N -m $m -p $p -fp $fp -n 5 -o results.txt
-            done
-        done
-    done
-done
+```cpp
+// Change:  std::mt19937 gen(rd());
+// To:      std::mt19937 gen(42);  // fixed seed for reproducibility
 ```
 
-Or use the program's built-in resume functionality to skip already-completed combinations by checking the output file.
+### Environment
 
-#### Python (network_generator.py)
-Edit the parameter loops:
+- Pin your Python dependencies using `requirements.txt` (provided).
+- Record your compiler version: `g++ --version`.
+- Record your OS and architecture.
 
-```python
-for N in [10000, 50000, 100000]:
-    for m in [2, 3, 4, 5]:
-        for p in [0.1, 0.3, 0.5]:
-            for fp in [0.1, 0.3, 0.5]:
-                # ...
-```
+### Recommended workflow
 
-### Adjusting Number of Simulations
+1. Fix the random seed (see above).
+2. Run the simulation: `./network_metrics -N 10000 -m 4 -p 0.5 -fp 0.3 -n 5 -o results.txt`
+3. Commit the output file alongside your code so reviewers can verify.
 
-#### C++ (Command-Line)
-Use the `-n` parameter:
+---
 
-```bash
-# Run 10 simulations
-./network_metrics -N 10000 -m 4 -p 0.5 -fp 0.3 -n 10
 
-# Run 20 simulations
-./network_metrics -N 10000 -m 4 -p 0.5 -fp 0.3 -n 20
-```
-
-#### Python (network_generator.py)
-Change the range in the simulation loop:
-
-```python
-for i in range(10):  # 10 simulations
-    # ...
-```
-
-### Changing Output File Names
-
-#### C++ (Command-Line)
-Use the `-o` parameter:
-
-```bash
-# Specify custom output file
-./network_metrics -N 10000 -m 4 -p 0.5 -fp 0.3 -o my_results.txt
-
-# Default output file is distances_<N>.txt (e.g., distances_10000.txt)
-```
-
-#### Python (network_generator.py)
-```python
-with open("my_results.txt", "a") as f:  # Change output filename
-    f.write(result_line)
-```
-
-## 📝 Algorithm Details
-
-### Random Walk Step Distribution
-
-The number of steps in a random walk follows a geometric-like distribution:
-
-```
-P(x) = (p * (1-p)^(x-1)) / (1 - (1-p)^10)
-```
-
-Where:
-- `x` ranges from 1 to 10 steps
-- `p` is the probability parameter
-- The denominator normalizes the distribution
-
-### Network Growth Process
-
-1. **Initialization**: Create ring of 10 nodes
-2. **For each new node**:
-   - Start at random node
-   - Perform random walks to mark `m` nodes (on average)
-   - Connect new node to all marked nodes
-   - With probability `fp`, connect pairs of marked nodes
-
-### Complexity
-
-- **Time Complexity**: O(N * m * E) where E is average edges per node
-- **Space Complexity**: O(N + E) for adjacency list representation
-- **Path Calculation**: O(N * (N + E)) for full BFS from each node
-
-## 📄 License
+## License
 
 This project is provided for research and educational purposes.
 
-## 🔗 References
+---
+
+## References
 
 - Network generation based on random walk growth models
 - Power law analysis using log-log regression
@@ -350,4 +393,4 @@ This project is provided for research and educational purposes.
 
 ---
 
-**Note**: The C++ implementation is optimized for performance and uses Unix-specific features (fork, wait). For Windows compatibility, use the Python implementation or WSL.
+> **Note:** The C++ implementation uses Unix-specific features (`fork`, `wait`). For Windows, use the Python implementation or WSL.
