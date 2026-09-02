@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the paper below (see 'preferred-citation')."
+title: "Large Network Generator"
+abstract: >-
+  A simple, efficient, and flexible random walk-based preferential attachment
+  algorithm for generating large complex networks with real-world properties
+  (power-law degree distributions, high clustering, and short average path
+  lengths). Provides C++ and Python implementations.
+type: software
+authors:
+  - family-names: "Morais"
+    given-names: "João Pedro C"
+  - family-names: "Ribeiro"
+    given-names: "Celso C"
+  - family-names: "Interian"
+    given-names: "Ruben"
+preferred-citation:
+  type: article
+  title: "Large Network Generator: a simple, efficient, and flexible graph formation algorithm"
+  authors:
+    - family-names: "Morais"
+      given-names: "João Pedro C"
+    - family-names: "Ribeiro"
+      given-names: "Celso C"
+    - family-names: "Interian"
+      given-names: "Ruben"
+  journal: "Journal of Physics: Complexity"
+  year: 2026
+  volume: 7
+  start: "025011"
+  doi: "10.1088/2632-072X/ae6eab"
+  publisher:
+    name: "IOP Publishing"

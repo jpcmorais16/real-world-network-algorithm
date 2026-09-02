@@ -23,6 +23,7 @@ This project provides both a **C++ implementation** (optimized for large-scale s
 - [Reproducibility](#reproducibility)
 - [Expected Output](#expected-output)
 - [Troubleshooting](#troubleshooting)
+- [Citation](#citation)
 - [License](#license)
 - [References](#references)
 
@@ -378,6 +379,31 @@ graph = generate_network(N=1000, m=4, p=0.5, fp=0.3)
 ---
 
 
+## Citation
+
+If you use this software or the network generation algorithm in your research, please cite the following paper:
+
+> Morais, J. P. C., Ribeiro, C. C., & Interian, R. (2026). Large Network Generator: a simple, efficient, and flexible graph formation algorithm. *Journal of Physics: Complexity*, **7**, 025011. https://doi.org/10.1088/2632-072X/ae6eab
+
+### BibTeX
+
+```bibtex
+@article{Morais2026,
+  author    = {Morais, João Pedro C and Ribeiro, Celso C and Interian, Ruben},
+  title     = {Large Network Generator: a simple, efficient, and flexible graph formation algorithm},
+  doi       = {10.1088/2632-072X/ae6eab},
+  year      = {2026},
+  publisher = {IOP Publishing},
+  volume    = {7},
+  pages     = {025011},
+  journal   = {Journal of Physics: Complexity}
+}
+```
+
+A machine-readable [`CITATION.cff`](CITATION.cff) file is also provided, so GitHub displays a **"Cite this repository"** button on the repo page.
+
+---
+
 ## License
 
 This project is provided for research and educational purposes.
@@ -386,6 +412,7 @@ This project is provided for research and educational purposes.
 
 ## References
 
+- **Primary reference:** Morais, Ribeiro & Interian (2026), *Large Network Generator: a simple, efficient, and flexible graph formation algorithm*, Journal of Physics: Complexity **7**, 025011. https://doi.org/10.1088/2632-072X/ae6eab — see [Citation](#citation).
 - Network generation based on random walk growth models
 - Power law analysis using log-log regression
 - Small-world network properties analysis
